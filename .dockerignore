@@ -1,0 +1,9 @@
+target/
+tmp/
+docs/
+.git/
+.idea/
+.vscode/
+agenthub-frontend/node_modules/
+agenthub-frontend/dist/
+*.log

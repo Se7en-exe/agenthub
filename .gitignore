@@ -1,0 +1,47 @@
+### CUSTOM ###
+application-local.yml
+tmp
+# 前端依赖与构建产物
+node_modules/
+agenthub-frontend/node_modules/
+agenthub-frontend/dist/
+# 上传的知识库文件与对话记忆
+chat-memory/
+*.log
+# 系统垃圾
+.DS_Store
+Thumbs.db
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/

@@ -1,0 +1,57 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # 测试里会真的调外部模型，CI 上没有 key，所以跳过测试只验证能编译能打包
+      - name: Build
+        run: mvn -B -q clean package -DskipTests
+
+      - name: Smoke test
+        run: |
+          mkdir -p ./tmp
+          java -Djava.io.tmpdir=./tmp -jar target/agenthub-0.0.1-SNAPSHOT.jar &
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:8123/api/health > /dev/null; then
+              echo "health ok after ${i}s"
+              curl -s http://127.0.0.1:8123/api/health
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "服务没起来"
+          exit 1
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: agenthub-frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: agenthub-frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run build

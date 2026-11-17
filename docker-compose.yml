@@ -1,0 +1,33 @@
+# 一条命令起整套：docker compose up -d
+# 起来后访问 http://127.0.0.1:8123/api/
+services:
+  backend:
+    build: .
+    container_name: agenthub-backend
+    ports:
+      - "8123:8123"
+    environment:
+      # 也可以在页面「模型设置」里填，这里给 Docker 场景留个入口
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-flash}
+      SERVER_PORT: "8123"
+    volumes:
+      # 对话记忆、上传的知识库、页面保存的 key 都在这里，删容器不丢
+      - agenthub-data:/app/tmp
+    restart: unless-stopped
+
+  # 可选：如果想用 nginx 托管前端并做反向代理，把 backend 的 ports 注释掉，
+  # 然后 docker compose --profile nginx up -d
+  frontend:
+    build: ./agenthub-frontend
+    container_name: agenthub-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    profiles: ["nginx"]
+
+volumes:
+  agenthub-data:
